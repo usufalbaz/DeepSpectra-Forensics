@@ -1,26 +1,27 @@
 """
-Core Feature Extraction Module for DeepSpectra.
-Extracts frequency-domain spectral representations using 2D Fast Fourier Transform (FFT)
-and Radial Max-Pooling.
+Core Feature Extraction Module for DeepSpectra v2.0.
+Extracts dual-metric frequency representations using 2D Fast Fourier Transform (FFT),
+capturing both Spectral Peak Energy and Intra-band Variance (Std) to resist lossy compression.
 """
 
-import numpy as np
 import cv2
+import numpy as np
 
 
 class SpectralExtractor:
     def __init__(self, target_radius: int = 120):
         """
         Initialize the extractor with a target frequency radius.
-        :param target_radius: Number of radial frequency bands to inspect.
+        :param target_radius: Number of concentric radial frequency bands to inspect.
         """
         self.target_radius = target_radius
 
     def process_image(self, image_input) -> np.ndarray:
         """
-        Converts an image into a 1D spectral feature vector.
+        Converts an image into a 240-D robust spectral feature vector.
+        Extracts both max peak magnitude and standard deviation per radial ring.
         :param image_input: Image filepath (str) or loaded numpy image array.
-        :return: 1D numpy array of size (target_radius,)
+        :return: 1D numpy array of size (target_radius * 2,)
         """
         # 1. Load or convert to grayscale
         if isinstance(image_input, str):
@@ -38,19 +39,21 @@ class SpectralExtractor:
         f_shift = np.fft.fftshift(f_transform)
         magnitude_spectrum = 20 * np.log(np.abs(f_shift) + 1)
 
-        # 3. Compute radial distance map from center
+        # 3. Compute radial Euclidean distance map from matrix center
         rows, cols = magnitude_spectrum.shape
         y_idx, x_idx = np.indices((rows, cols))
         center_x, center_y = cols // 2, rows // 2
         radial_map = np.hypot(x_idx - center_x, y_idx - center_y).astype(int)
 
-        # 4. Extract maximum spectral energy at each radial distance
+        # 4. Extract Dual Features (Peak + Variance) per concentric ring
         features = []
         for rad in range(self.target_radius):
             mask = (radial_map == rad)
             if np.any(mask):
-                features.append(np.max(magnitude_spectrum[mask]))
+                ring_values = magnitude_spectrum[mask]
+                features.append(np.max(ring_values))
+                features.append(np.std(ring_values))
             else:
-                features.append(0.0)
+                features.extend([0.0, 0.0])
 
         return np.array(features, dtype=np.float32)
