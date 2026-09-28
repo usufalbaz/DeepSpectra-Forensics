@@ -37,7 +37,7 @@ Input Image (Spatial Domain)
        │
        ▼
 [ Calibrated Linear Support Vector Machine (SVC) ] ──> Output: REAL vs. DEEPFAKE (%)
-
+```
 1. Mathematical Formulation
 
 Given an input grayscale image f(x, y) of dimensions M \times N, its discrete
