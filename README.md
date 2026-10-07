@@ -1,73 +1,68 @@
-# DeepSpectra-Forensics 🔬 (v2.0 Robust Release)
-> Resilient Frequency-Domain Deepfake Detection Framework Resistant to Social Media Resampling & Screen Capture Artifacts.
+# 🔬 DeepSpectra-Forensics (v2.0 Robust Release)
+> Resilient Frequency-Domain Deepfake & Synthetic Artifact Detection Framework Resistant to Social Media Resampling & Compression.
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
-[![Release](https://img.shields.io/badge/Release-v2.0--Robust-orange.svg)](https://github.com/usufalbaz/DeepSpectra-Forensics)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Domain](https://img.shields.io/badge/Domain-Computer%20Vision%20%7C%20AI%20Safety-red.svg)]()
-
----
-
-## 📌 What's New in v2.0: The Anti-Compression Upgrade
-Standard frequency-based forensic methods often collapse when an image undergoes lossy JPEG compression or screen capture (Screenshots), as high-frequency components are aggressively smoothed out.
-
-DeepSpectra v2.0 solves this vulnerability via two mechanisms:
-1. **Concentric Spectral Variance Tracking:** Beyond maximum magnitude, the extractor computes intra-band dispersion, capturing synthetic asymmetry that survives compression.
-2. **Adversarial Resampling Augmentation:** The classification boundary is calibrated directly against simulated screen captures, downsampling, and aggressive quantization.
+[![CI Pipeline](https://github.com/usufalbaz/DeepSpectra-Forensics/actions/workflows/ci.yml/badge.svg)](https://github.com/usufalbaz/DeepSpectra-Forensics/actions)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Domain: AI Safety](https://img.shields.io/badge/Domain-Computer%20Vision%20%7C%20AI%20Safety-red.svg)]()
 
 ---
 
-## 🧠 Core Methodology & Architecture
+## 📌 Theoretical Framework & The Anti-Compression Paradigm
 
-The pipeline processes input images through the following deterministic stages:
+Standard spatial-domain deepfake detectors frequently fail when images undergo lossy JPEG compression, downsampling, or screen capture (social media resampling), as high-frequency generative grid artifacts are aggressively smoothed out.
 
-1. **Spatial to Frequency Decomposition:** Computes 2D Fast Fourier Transform (FFT) on grayscale imagery.
-2. **Zero-Frequency Centering:** Shifts DC components to the matrix origin.
-3. **Dual Metric Radial Extraction:** Simultaneously captures Peak Energy and Spectral Variance across concentric radial distances.
-4. **Discriminative Classification:** Generates a 240-D robust feature vector evaluated by a calibrated Support Vector Classifier (SVC).
+DeepSpectra v2.0 circumvents this vulnerability via dual frequency-domain mechanisms:
+1. Concentric Spectral Variance Tracking: Beyond calculating peak resonance magnitude, the extractor isolates intra-band frequency dispersion across concentric radial Euclidean rings, isolating synthetic lattice perturbations that survive heavy quantization.
+2. Adversarial Resampling Calibration: Decision boundaries are calibrated against simulated screenshots, downsampling, and lossy compression artifacts.
 
 ---
 
-## 🔬 Mathematical Formulation
+## 🧠 System Architecture & Mathematical Foundations
 
-### 1. 2D Discrete Fourier Transform
-Given an input grayscale image f(x, y) of dimensions M x N, its discrete frequency representation F(u, v) is defined, and the centered magnitude spectrum is:
+    +------------------+      +-------------------------+      +-----------------------------+      +--------------------+
+    |   Input Image    | ---> |  2D-FFT Decomposition   | ---> |  Concentric Ring Extractor  | ---> |   Calibrated SVC   |
+    | (RGB/Screenshot) |      |   & Log Magnitude Shift |      |  (Peak + Variance = 240-D)  |      |  (Real vs Fake)    |
+    +------------------+      +-------------------------+      +-----------------------------+      +--------------------+
 
-S(u, v) = 20 * log( |F_shift(u, v)| + 1 )
+### 1. 2D Fast Fourier Transform (FFT)
+Given an input grayscale image f(x, y) of dimensions M x N, the centered log magnitude spectrum S(u, v) is derived via:
+
+    S(u, v) = 20 * log( |F_shift(u, v)| + 1 )
 
 ### 2. Dual-Metric Concentric Ring Extraction
-For each frequency band at radial Euclidean distance r, we extract both peak resonance and intra-band variance:
+For each radial Euclidean distance r from the matrix center (u0, v0):
+* Peak Energy: V_peak(r) = max S(u, v)
+* Spectral Dispersion: V_var(r) = std(S(u, v))
 
-- V_peak(r) = max S(u, v)
-- V_variance(r) = standard deviation of S(u, v) within ring r
-
-Even if JPEG compression attenuates the absolute magnitude V_peak, structural generative artifacts remain exposed through the localized perturbation captured in V_variance.
-
----
-
-## 🚀 Quickstart & Installation
-
-### 1. Clone the Repository
-git clone https://github.com/usufalbaz/DeepSpectra-Forensics.git
-cd DeepSpectra-Forensics
-
-### 2. Install Dependencies
-pip install -r requirements.txt
-pip install gradio
-
-### 3. Run Pipeline Demo
-python demo.py
+The resulting concatenated feature vector x in R^240 provides a compression-resilient forensic signature evaluated by a calibrated Support Vector Classifier (SVC).
 
 ---
 
-## 📂 Repository Structure
-- extractor.py : 2D-FFT & Radial Max/Variance Feature Extractor
-- classifier.py : Serialized Model Engine with Probability Calibration
-- demo.py : CLI Pipeline & Adversarial Calibration Script
-- requirements.txt : Production Dependencies
-- README.md : Technical & Theoretical Documentation
+## 🛠️ Tech Stack
+* Signal Processing & CV: OpenCV, NumPy, Scikit-Image, SciPy
+* Classification: Scikit-Learn (Support Vector Machines)
+* Testing & Automation: Pytest, GitHub Actions CI
+* User Interface: Streamlit, Gradio
 
 ---
 
-## 📜 License
-Distributed under the MIT License. Open for forensic benchmarking and adversarial AI safety research.
+## 🚀 Quickstart & Usage
+
+1. Clone the Repository:
+    git clone https://github.com/usufalbaz/DeepSpectra-Forensics.git
+    cd DeepSpectra-Forensics
+
+2. Install Dependencies:
+    pip install -r requirements.txt
+
+3. Run Automated Test Suite:
+    pytest tests/
+
+4. Launch Interactive Forensic Scanner:
+    streamlit run streamlit_app.py
+
+---
+
+## 📄 License
+Distributed under the MIT License. See LICENSE for details.
